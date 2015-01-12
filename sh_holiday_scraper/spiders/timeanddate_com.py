@@ -1,3 +1,5 @@
+import re
+
 import scrapy
 import scrapy.http
 import dateutil.parser
@@ -21,7 +23,7 @@ class TimeAndDate_Com(scrapy.Spider):
                 continue
             days.append({
                 'date': repr(str(dateutil.parser.parse(columns[0]).date())),
-                'title': columns[2],
+                'title': re.sub('[^\x00-\x7F]', '_', columns[2]),
             })
         print(
             u'Holidays are:\n    [\n{}    ]'.format(u''.join([
