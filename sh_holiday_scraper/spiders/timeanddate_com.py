@@ -24,7 +24,7 @@ class TimeAndDate_Com(scrapy.Spider):
                 'title': columns[2],
             })
         print(
-            u'Holidays are:\n    {{\n{}    }}'.format(u''.join([
+            u'Holidays are:\n    [\n{}    ]'.format(u''.join([
                 u'        {},  # {}\n'.format(
                     day['date'], 
                     day['title'],
