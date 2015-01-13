@@ -4,6 +4,9 @@ import scrapy
 import scrapy.http
 import dateutil.parser
 
+def strip_non_ascii(text):
+    return re.sub('[^\x00-\x7F]', '_', text)
+
 class TimeAndDate_Com(scrapy.Spider):
     name = "timeanddate_com"
 
@@ -19,11 +22,20 @@ class TimeAndDate_Com(scrapy.Spider):
         for row in response.xpath('//table[contains(@class,"tb-cl")]/tbody/tr'):
             columns = [u''.join(column.xpath('.//text()').extract()) for column in row.xpath('./td|./th')]
             holiday_type = columns[3]
-            if holiday_type not in ['National holiday', 'Bank holiday']:
+            if holiday_type not in [
+                    'National holiday', 
+                    'Bank holiday', 
+                    'Local holiday',
+                    'Common Local holidays',
+            ]:
                 continue
+            title = strip_non_ascii(columns[2])
+            extra_text = strip_non_ascii(u' '.join(columns[4:]))
+            if len(extra_text) > 1:
+                title = '{} ({})'.format(title, extra_text)
             days.append({
                 'date': repr(str(dateutil.parser.parse(columns[0]).date())),
-                'title': re.sub('[^\x00-\x7F]', '_', columns[2]),
+                'title': title,
             })
         print(
             u'Holidays are:\n    [\n{}    ]'.format(u''.join([
