@@ -18,7 +18,7 @@ class TimeAndDate_Com(scrapy.Spider):
         days = []
         for row in response.xpath('//table[contains(@class,"tb-cl")]/tbody/tr'):
             columns = [u''.join(column.xpath('.//text()').extract()) for column in row.xpath('./td|./th')]
-            holiday_type = columns[-1]
+            holiday_type = columns[3]
             if holiday_type not in ['National holiday', 'Bank holiday']:
                 continue
             days.append({
