@@ -1,18 +1,17 @@
 import re
+import sys
 
 import scrapy
 import scrapy.http
 import dateutil.parser
 
-def strip_non_ascii(text):
-    return re.sub('[^\x00-\x7F]', '_', text)
-
 class TimeAndDate_Com(scrapy.Spider):
     name = "timeanddate_com"
 
-    def __init__(self, country):
+    def __init__(self, country, out=None):
         super(TimeAndDate_Com, self).__init__()
         self.country = country
+        self.out = out
 
     def start_requests(self):
         yield scrapy.http.Request('http://www.timeanddate.com/holidays/{}/'.format(self.country))
@@ -29,19 +28,21 @@ class TimeAndDate_Com(scrapy.Spider):
                     'Common Local holidays',
             ]:
                 continue
-            title = strip_non_ascii(columns[2])
-            extra_text = strip_non_ascii(u' '.join(columns[4:]))
+            title = columns[2]
+            extra_text = u' '.join(columns[4:])
             if len(extra_text) > 1:
-                title = '{} ({})'.format(title, extra_text)
+                title = u'{} ({})'.format(title, extra_text)
             days.append({
-                'date': repr(str(dateutil.parser.parse(columns[0]).date())),
+                'date': unicode(dateutil.parser.parse(columns[0]).date()),
                 'title': title,
             })
-        print(
-            u'Holidays are:\n    [\n{}    ]'.format(u''.join([
-                u'        {},  # {}\n'.format(
-                    day['date'], 
-                    day['title'],
-                ) for day in days
-            ]))
-        )
+        if not self.out or self.out == '-':
+            outfile = sys.stdout
+        else:
+            outfile = open(self.out, 'w')
+        outfile.write(u'holidays:\n{}'.format(
+            u'\n'.join([u'  - {}  # {}'.format(
+                day['date'],
+                day['title']
+            ) for day in days])
+        ).encode('utf-8'))

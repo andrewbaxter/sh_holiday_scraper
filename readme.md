@@ -7,6 +7,8 @@ Note: Country names are typically lower case, and either hyphenated or acronymed
 ### Usage
 
 ```bash
-scrapy timeanddate_com -a country=COUNTRY
+scrapy timeanddate_com -a country=COUNTRY [ -a out=FILENAME ]
 ```
+
+If `out` is not specified or is `-`, writes the result to stdout.  Otherwise, the result is written to the specified file.
 
