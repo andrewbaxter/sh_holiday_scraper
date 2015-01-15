@@ -26,6 +26,7 @@ class TimeAndDate_Com(scrapy.Spider):
                     'Bank holiday', 
                     'Local holiday',
                     'Common Local holidays',
+                    'Feriado Nacional', # Brazil
             ]:
                 continue
             title = columns[2]
